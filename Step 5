@@ -1,0 +1,77 @@
+CREATE OR REPLACE TABLE `assignment-likhith-raj-loop.new_dataset_name.ComparisonWithRange` AS
+WITH GRU_data AS (
+  -- Extract Grubhub data and format opening and closing times
+  SELECT
+    slug AS gruhub_slug,
+    vb_name AS gruhub_vb_name,
+    vb_address AS gruhub_vb_address,
+    SAFE_CAST(SUBSTRING(opening_time, 1, 5) AS STRING) AS gruhub_opening_time,
+    SAFE_CAST(SUBSTRING(closing_time, 1, 5) AS STRING) AS gruhub_closing_time
+  FROM `assignment-likhith-raj-loop.new_dataset_name.GRUoutput_table`
+),
+UE_data AS (
+  -- Extract UberEats data and format start and end times
+  SELECT
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    SAFE_CAST(SUBSTRING(start_time, 1, 5) AS STRING) AS ue_start_time,
+    SAFE_CAST(SUBSTRING(end_time, 1, 5) AS STRING) AS ue_end_time
+  FROM `assignment-likhith-raj-loop.new_dataset_name.UBEREATeatoutput_table`
+),
+-- Convert time to minutes from midnight for range comparison
+TimeComparison AS (
+  SELECT
+    GRU_data.gruhub_slug,
+    GRU_data.gruhub_opening_time,
+    GRU_data.gruhub_closing_time,
+    UE_data.ue_slug,
+    UE_data.ue_start_time,
+    UE_data.ue_end_time,
+    -- Handle 24-hour operation (00:00 - 00:00)
+    CASE 
+      WHEN gruhub_opening_time = '00:00' AND gruhub_closing_time = '00:00' THEN 0
+      ELSE (CAST(SUBSTRING(gruhub_opening_time, 1, 2) AS INT64) * 60 + CAST(SUBSTRING(gruhub_opening_time, 4, 2) AS INT64))
+    END AS gruhub_opening_minutes,
+    CASE 
+      WHEN gruhub_opening_time = '00:00' AND gruhub_closing_time = '00:00' THEN 1440
+      ELSE (CAST(SUBSTRING(gruhub_closing_time, 1, 2) AS INT64) * 60 + CAST(SUBSTRING(gruhub_closing_time, 4, 2) AS INT64))
+    END AS gruhub_closing_minutes,
+    CASE 
+      WHEN ue_start_time = '00:00' AND ue_end_time = '00:00' THEN 0
+      ELSE (CAST(SUBSTRING(ue_start_time, 1, 2) AS INT64) * 60 + CAST(SUBSTRING(ue_start_time, 4, 2) AS INT64))
+    END AS ue_start_minutes,
+    CASE 
+      WHEN ue_start_time = '00:00' AND ue_end_time = '00:00' THEN 1440
+      ELSE (CAST(SUBSTRING(ue_end_time, 1, 2) AS INT64) * 60 + CAST(SUBSTRING(ue_end_time, 4, 2) AS INT64))
+    END AS ue_end_minutes
+  FROM
+    GRU_data
+  JOIN
+    UE_data
+  ON
+    GRU_data.gruhub_vb_name = UE_data.ue_vb_name
+    OR GRU_data.gruhub_vb_address = UE_data.ue_address
+)
+-- Determine the range comparison
+SELECT
+  gruhub_slug,
+  CONCAT(gruhub_opening_time, ' - ', gruhub_closing_time) AS gruhub_business_hours,
+  ue_slug,
+  CONCAT(ue_start_time, ' - ', ue_end_time) AS ue_business_hours,
+  CASE
+    -- If both business hours are completely the same (either both open all 24 hours or overlapping)
+    WHEN (gruhub_opening_minutes = ue_start_minutes AND gruhub_closing_minutes = ue_end_minutes) 
+         OR (gruhub_opening_minutes <= ue_end_minutes AND gruhub_closing_minutes >= ue_start_minutes)
+         OR (gruhub_opening_minutes = 0 AND gruhub_closing_minutes = 1440) 
+         OR (ue_start_minutes = 0 AND ue_end_minutes = 1440) THEN 'In Range'
+    -- If there's a 5-minute difference, mark as out of range with a small margin
+    WHEN ABS(gruhub_opening_minutes - ue_start_minutes) <= 5 
+         OR ABS(gruhub_closing_minutes - ue_end_minutes) <= 5 THEN 'Out of Range with 5 mins difference'
+    ELSE 'Out of Range'
+  END AS is_out_range
+FROM
+  TimeComparison;
+
