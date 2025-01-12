@@ -1,0 +1,43 @@
+-- Create or Replace the table with converted times
+CREATE OR REPLACE TABLE `assignment-likhith-raj-loop.new_dataset_name.GRUoutput_table` AS
+WITH extracted_hours AS (
+  SELECT
+    slug,
+    vb_name,
+    vb_address,
+    TIMESTAMP(timestamp) AS timestamp, -- Convert timestamp to TIMESTAMP type
+    day_schedule.days_of_week,
+    -- Extract time as string and convert to HH:MM format
+    day_schedule.from_time,
+    day_schedule.to_time
+  FROM (
+    SELECT
+      slug,
+      vb_name,
+      vb_address,
+      timestamp,
+      response,
+      -- Unnest schedule_rules to extract days, opening, and closing times
+      ARRAY(
+        SELECT AS STRUCT
+          rule.days_of_week AS days_of_week,
+          rule.from AS from_time,
+          rule.to AS to_time
+        FROM UNNEST(JSON_EXTRACT_ARRAY(response, '$.availability_by_catalog.STANDARD_DELIVERY.schedule_rules')) AS rule
+      ) AS day_schedule
+    FROM
+      `arboreal-vision-339901.take_home_v2.virtual_kitchen_grubhub_hours`
+  ) AS nested_data,
+  UNNEST(day_schedule) AS day_schedule -- Flatten the extracted schedule
+)
+SELECT
+  slug,
+  vb_name,
+  vb_address,
+  days_of_week,
+  -- Handle milliseconds by stripping them and converting to HH:MM format
+  FORMAT_TIMESTAMP('%H:%M', PARSE_TIMESTAMP('%H:%M:%S', REGEXP_REPLACE(JSON_EXTRACT_SCALAR(from_time, '$'), r'\.\d+$', ''))) AS opening_time,
+  FORMAT_TIMESTAMP('%H:%M', PARSE_TIMESTAMP('%H:%M:%S', REGEXP_REPLACE(JSON_EXTRACT_SCALAR(to_time, '$'), r'\.\d+$', ''))) AS closing_time,
+  timestamp
+FROM
+  extracted_hours;
