@@ -65,9 +65,3 @@ The goal is to compute a metric called **business hour mismatch** for each resta
 | johnspizz    | johnspizz     | 10:00 - 22:00          | 10:00 - 22:00           | In Range                      |
 | pizzahut     | pizzahut      | 11:00 - 23:00          | 11:00 - 22:30           | Out of Range                  |
 | tacoqueen    | tacoqueen     | 09:00 - 20:00          | 09:05 - 20:00           | Out of Range with 5 mins diff |
-
-## How to Run
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-username/business-hour-mismatch-analysis.git
