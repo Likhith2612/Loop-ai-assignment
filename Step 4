@@ -1,0 +1,55 @@
+CREATE OR REPLACE TABLE `assignment-likhith-raj-loop.new_dataset_name.ComparisonResultTable` AS
+WITH GRU_data AS (
+  SELECT
+    slug AS gruhub_slug,
+    vb_name AS gruhub_vb_name,
+    vb_address AS gruhub_vb_address,
+    IFNULL(
+      SAFE_CAST(CONCAT(CAST(SUBSTRING(opening_time, 1, 5) AS STRING)) AS STRING),
+      '00:00'
+    ) AS gruhub_opening_time,
+    
+    IFNULL(
+      SAFE_CAST(CONCAT(CAST(SUBSTRING(closing_time, 1, 5) AS STRING)) AS STRING),
+      '00:00'
+    ) AS gruhub_closing_time
+  FROM `assignment-likhith-raj-loop.new_dataset_name.GRUoutput_table`
+),
+UE_data AS (
+  SELECT
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    IFNULL(
+      SAFE_CAST(CONCAT(CAST(SUBSTRING(start_time, 1, 5) AS STRING)) AS STRING),
+      '00:00'
+    ) AS ue_start_time,
+    
+    IFNULL(
+      SAFE_CAST(CONCAT(CAST(SUBSTRING(end_time, 1, 5) AS STRING)) AS STRING),
+      '00:00'
+    ) AS ue_end_time
+  FROM `assignment-likhith-raj-loop.new_dataset_name.UBEREATeatoutput_table`
+)
+SELECT
+  GRU_data.gruhub_slug,
+  CONCAT(
+    GRU_data.gruhub_opening_time, 
+    ' - ', 
+    GRU_data.gruhub_closing_time
+  ) AS gruhub_business_hours,
+  UE_data.ue_slug,
+  CONCAT(
+    UE_data.ue_start_time, 
+    ' - ', 
+    UE_data.ue_end_time
+  ) AS ue_business_hours
+FROM
+  GRU_data
+JOIN
+  UE_data
+ON
+  GRU_data.gruhub_vb_name = UE_data.ue_vb_name
+  OR GRU_data.gruhub_vb_address = UE_data.ue_address;
