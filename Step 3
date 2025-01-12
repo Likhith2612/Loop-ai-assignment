@@ -1,0 +1,1311 @@
+## Step 3.1 
+WITH Parsed_UberEats AS (
+    SELECT 
+        JSON_EXTRACT_ARRAY(response, '$.data.menuMapping') AS menu_mapping
+    FROM `arboreal-vision-339901.take_home_v2.virtual_kitchen_ubereats_hours`
+),
+ExtractedUUIDs AS (
+    SELECT
+        JSON_VALUE(menu_item, '$.menuUUID') AS menu_uuid
+    FROM Parsed_UberEats,
+    UNNEST(menu_mapping) AS menu_item
+)
+SELECT DISTINCT menu_uuid
+FROM ExtractedUUIDs
+WHERE menu_uuid IS NOT NULL
+LIMIT 1000;
+##step 3.2
+
+-- Create the table under the correct dataset
+CREATE OR REPLACE TABLE `assignment-likhith-raj-loop.new_dataset_name.UBEREATeatoutput_table` AS
+WITH Parsed_UberEats AS (
+    SELECT 
+        slug AS ue_slug,
+        b_name AS ue_b_name,
+        vb_name AS ue_vb_name,
+        vb_platform AS ue_platform,
+        vb_address AS ue_address,
+        timestamp AS ue_timestamp,
+        response
+    FROM `arboreal-vision-339901.take_home_v2.virtual_kitchen_ubereats_hours`
+),
+ExtractedMenuStructures AS (
+    SELECT
+        ue_slug,
+        ue_b_name,
+        ue_vb_name,
+        ue_platform,
+        ue_address,
+        ue_timestamp,
+        JSON_EXTRACT(response, '$.data.menuStructures') AS menu_structures
+    FROM Parsed_UberEats
+),
+-- Manually reference the structure IDs
+FlattenedMenuStructures AS (
+    SELECT 
+        ue_slug,
+        ue_b_name,
+        ue_vb_name,
+        ue_platform,
+        ue_address,
+        ue_timestamp,
+        -- Manually reference the structure IDs
+        JSON_EXTRACT(menu_structures, '$.928f2083-e978-4951-925e-a830d08bd0cb.sections') AS section_array_1,
+JSON_EXTRACT(menu_structures, '$.26bd579e-5664-4f0a-8465-2f5eb5fbe705.sections') AS section_array_2,
+JSON_EXTRACT(menu_structures, '$.4b9b1f81-0391-464c-90de-1254e14a6b82.sections') AS section_array_3,
+JSON_EXTRACT(menu_structures, '$.01900651-ff81-4293-8537-9d487c4ff405.sections') AS section_array_4,
+JSON_EXTRACT(menu_structures, '$.e520ab02-6ec1-4fdf-b810-0d1b74fc719c.sections') AS section_array_5,
+JSON_EXTRACT(menu_structures, '$.ebbc7186-57f0-480c-ad97-057282989256.sections') AS section_array_6,
+JSON_EXTRACT(menu_structures, '$.045f8ce5-fd7f-54fd-b37a-d20395c1f3bf.sections') AS section_array_7,
+JSON_EXTRACT(menu_structures, '$.0ff9bbd4-c680-5731-86ad-cdc6f361d5b9.sections') AS section_array_8,
+JSON_EXTRACT(menu_structures, '$.21167a79-99f2-4ace-b002-84f2eb7d52f4.sections') AS section_array_9,
+JSON_EXTRACT(menu_structures, '$.64cb768c-49ef-4dc6-99a7-0bcccf4d6f1b.sections') AS section_array_10,
+JSON_EXTRACT(menu_structures, '$.a2ed07ab-8f70-47e1-9550-270a23ec5e37.sections') AS section_array_11,
+JSON_EXTRACT(menu_structures, '$.f52b9307-e328-4485-a25c-b78f9143400e.sections') AS section_array_12,
+JSON_EXTRACT(menu_structures, '$.348c2d64-ed39-4a64-9035-0e7168086782.sections') AS section_array_13,
+JSON_EXTRACT(menu_structures, '$.ac754de1-c489-44da-a9cd-0bb802e8c43a.sections') AS section_array_14,
+JSON_EXTRACT(menu_structures, '$.a94dc541-8b4f-414e-8dc8-5b1eb31236eb.sections') AS section_array_15,
+JSON_EXTRACT(menu_structures, '$.529207f5-de84-4099-8e3f-6e7ab159a68d.sections') AS section_array_16,
+JSON_EXTRACT(menu_structures, '$.49ed730c-44e3-5232-9259-f59792214436.sections') AS section_array_17,
+JSON_EXTRACT(menu_structures, '$.21bf2952-1b4e-45cc-b768-03d404fa5035.sections') AS section_array_18,
+JSON_EXTRACT(menu_structures, '$.2e42996d-7544-4ae6-b13e-0a3995e64c58.sections') AS section_array_19,
+JSON_EXTRACT(menu_structures, '$.eb8a2773-10ae-5241-af12-33c0496c113b.sections') AS section_array_20,
+JSON_EXTRACT(menu_structures, '$.9b28f2cc-80bb-4eee-8eda-cd9ed62e6969.sections') AS section_array_21,
+JSON_EXTRACT(menu_structures, '$.b23e9293-d6ea-5aff-ac53-239307eb989e.sections') AS section_array_22,
+JSON_EXTRACT(menu_structures, '$.d62628f4-9b10-4099-aed0-69f904a3a91e.sections') AS section_array_23,
+JSON_EXTRACT(menu_structures, '$.7ee4870c-8461-4ffb-aa40-2b96374b523b.sections') AS section_array_24,
+JSON_EXTRACT(menu_structures, '$.42e86ea7-f8da-478e-9771-d53321bee925.sections') AS section_array_25,
+JSON_EXTRACT(menu_structures, '$.2eb86432-5509-4fd6-a69f-cc29c10c282f.sections') AS section_array_26,
+JSON_EXTRACT(menu_structures, '$.d99a2b6c-f991-45f7-99a2-cbb8b7b63bd6.sections') AS section_array_27,
+JSON_EXTRACT(menu_structures, '$.1e3591cd-14a5-441c-a9cd-110df67a32be.sections') AS section_array_28,
+JSON_EXTRACT(menu_structures, '$.594fc59a-2737-4e7d-b317-17c777f91940.sections') AS section_array_29,
+JSON_EXTRACT(menu_structures, '$.9c193ee8-8765-4509-9b01-4b923e8e8cfa.sections') AS section_array_30,
+JSON_EXTRACT(menu_structures, '$.c29b420b-9408-5705-be32-9ba7cb9814c7.sections') AS section_array_31,
+JSON_EXTRACT(menu_structures, '$.30f825f0-47b0-4e1f-b816-01137f5170e5.sections') AS section_array_32,
+JSON_EXTRACT(menu_structures, '$.f7f18450-9a39-5c53-8a7c-39afa2b366e8.sections') AS section_array_33,
+JSON_EXTRACT(menu_structures, '$.a7139715-dd04-403e-b5be-53b11d686c65.sections') AS section_array_34,
+JSON_EXTRACT(menu_structures, '$.f6fbe7b2-9d1f-4e0a-bc0d-3b59ff694c67.sections') AS section_array_35,
+JSON_EXTRACT(menu_structures, '$.af23c17a-7d80-411f-b590-0c4b85d068e4.sections') AS section_array_36,
+JSON_EXTRACT(menu_structures, '$.fdcd2c76-5b63-5a89-a094-de83452259e4.sections') AS section_array_37,
+JSON_EXTRACT(menu_structures, '$.c0b56f87-41e1-4e02-89d1-9b6158875477.sections') AS section_array_38,
+JSON_EXTRACT(menu_structures, '$.7a740296-c606-4c41-98a8-e192b45dbb31.sections') AS section_array_39,
+JSON_EXTRACT(menu_structures, '$.e1b6c8e3-182c-53b0-9fa8-95bb576aa4aa.sections') AS section_array_40,
+JSON_EXTRACT(menu_structures, '$.2b8b3e1c-c6fe-46fc-b387-8e92dc3394ce.sections') AS section_array_41,
+JSON_EXTRACT(menu_structures, '$.5b44eeed-6a43-4a90-9508-9a072a176bb4.sections') AS section_array_42,
+JSON_EXTRACT(menu_structures, '$.0af79946-9b57-50a0-b65c-3e1a05a7f1dc.sections') AS section_array_43,
+JSON_EXTRACT(menu_structures, '$.7cc6bcd8-2057-4ec8-9244-41016240f913.sections') AS section_array_44,
+JSON_EXTRACT(menu_structures, '$.f77f3ab3-aef3-47ee-9459-cba124b098e8.sections') AS section_array_45,
+JSON_EXTRACT(menu_structures, '$.1afd2ce9-e38a-594a-bfd5-f66e9189e052.sections') AS section_array_46,
+JSON_EXTRACT(menu_structures, '$.be2f925f-fba6-421f-8636-ee2acf77fcb1.sections') AS section_array_47,
+JSON_EXTRACT(menu_structures, '$.3aec532c-382c-4963-be16-e1898a665e31.sections') AS section_array_48,
+JSON_EXTRACT(menu_structures, '$.6755d2ca-23ee-4f58-8704-7a56ad9b08e1.sections') AS section_array_49,
+JSON_EXTRACT(menu_structures, '$.83354580-1d3c-516b-b141-d57b9d839387.sections') AS section_array_50,
+JSON_EXTRACT(menu_structures, '$.8f49fa80-67a6-566a-899b-7f6c8399f6bd.sections') AS section_array_51,
+JSON_EXTRACT(menu_structures, '$.22925c2a-199a-59f9-8a29-1fd351051f44.sections') AS section_array_52,
+JSON_EXTRACT(menu_structures, '$.6e23804c-0e3b-4e95-a9e1-dc1a39669f9b.sections') AS section_array_53,
+JSON_EXTRACT(menu_structures, '$.779902cd-2014-45bb-8dd7-980d01fd6a7f.sections') AS section_array_54,
+JSON_EXTRACT(menu_structures, '$.505508e3-fc67-46c4-8b30-88241b37a486.sections') AS section_array_55,
+JSON_EXTRACT(menu_structures, '$.35188d0d-8f4c-5109-8b3d-6b6f7fd478a1.sections') AS section_array_56,
+JSON_EXTRACT(menu_structures, '$.8c02b8a4-c8c7-4cc1-970d-351f529f21c0.sections') AS section_array_57,
+JSON_EXTRACT(menu_structures, '$.16f7df92-c323-53c3-9cbd-a0aa01f9f035.sections') AS section_array_58,
+JSON_EXTRACT(menu_structures, '$.fe7d784a-ca03-5e17-9d91-e88a64d5bf18.sections') AS section_array_59,
+JSON_EXTRACT(menu_structures, '$.98788660-14bd-4424-a14b-1649fd71a213.sections') AS section_array_60,
+JSON_EXTRACT(menu_structures, '$.7c77bac4-dc4b-4d38-92e9-e997c87414aa.sections') AS section_array_61,
+JSON_EXTRACT(menu_structures, '$.4872a487-92f5-5a14-ae34-a0257b7cf906.sections') AS section_array_62,
+JSON_EXTRACT(menu_structures, '$.cbfa37af-09b1-4c83-b7ce-d2831a135be1.sections') AS section_array_63,
+JSON_EXTRACT(menu_structures, '$.563e7034-16d0-40c1-883d-8739792ec202.sections') AS section_array_64,
+JSON_EXTRACT(menu_structures, '$.4801b1ba-d262-53c1-802d-345bb49ca68f.sections') AS section_array_65,
+JSON_EXTRACT(menu_structures, '$.477b4d61-e043-41d3-b71d-3c77c3d0618d.sections') AS section_array_66,
+JSON_EXTRACT(menu_structures, '$.680c47ca-8cba-4434-8882-9a00fccee68d.sections') AS section_array_67,
+JSON_EXTRACT(menu_structures, '$.7656d159-26f6-40ba-abd8-6f61b883f5f3.sections') AS section_array_68,
+JSON_EXTRACT(menu_structures, '$.b23d14ef-9ba8-5f72-871d-1511e552feb1.sections') AS section_array_69,
+JSON_EXTRACT(menu_structures, '$.f6870fed-b0fc-5f86-8073-34785787ccc3.sections') AS section_array_70,
+JSON_EXTRACT(menu_structures, '$.0cc94fd9-79f8-5230-90fd-01ff2c002bb0.sections') AS section_array_72,
+JSON_EXTRACT(menu_structures, '$.e8978d62-220f-4ac4-b3b2-6a7a5293f9bb.sections') AS section_array_73,
+JSON_EXTRACT(menu_structures, '$.d1003181-c3e4-5b9f-beaf-bb4cc34d3325.sections') AS section_array_74,
+JSON_EXTRACT(menu_structures, '$.fc24304a-3c6f-43e3-b166-75ad588cc760.sections') AS section_array_75,
+JSON_EXTRACT(menu_structures, '$.590ecc28-5627-4b32-87a5-1082d2859a01.sections') AS section_array_76,
+JSON_EXTRACT(menu_structures, '$.2ec4003b-4559-5569-b46c-deeeabbe07c5.sections') AS section_array_77,
+JSON_EXTRACT(menu_structures, '$.a9fd8593-4b16-5b76-b28e-987c7ce4aec3.sections') AS section_array_78,
+JSON_EXTRACT(menu_structures, '$.21b5d747-82f8-5939-b3f6-3c3f0e4fa4a6.sections') AS section_array_79,
+JSON_EXTRACT(menu_structures, '$.34726907-983f-5759-a63c-6fcb88c6f4ca.sections') AS section_array_80,
+JSON_EXTRACT(menu_structures, '$.130571b2-3c82-442a-800e-23c901e48c12.sections') AS section_array_81,
+JSON_EXTRACT(menu_structures, '$.d2b2a3c2-8366-5d5b-9227-474de075a098.sections') AS section_array_82,
+JSON_EXTRACT(menu_structures, '$.3c05136c-90e6-53ab-a124-fae505e2ce8c.sections') AS section_array_83,
+JSON_EXTRACT(menu_structures, '$.0c43c13a-db13-4ec5-a1e8-faf5ac44d8a5.sections') AS section_array_84,
+JSON_EXTRACT(menu_structures, '$.450b24c3-c874-46fe-894a-849569ed0c8b.sections') AS section_array_85,
+JSON_EXTRACT(menu_structures, '$.db9787a4-f7e4-4c8c-8761-2dbe36ead1f6.sections') AS section_array_86,
+JSON_EXTRACT(menu_structures, '$.a7f723ac-1569-4c72-94b7-65b73f89742a.sections') AS section_array_87,
+JSON_EXTRACT(menu_structures, '$.c6588694-244b-5540-b9e6-3c3a88e2e4ba.sections') AS section_array_88,
+JSON_EXTRACT(menu_structures, '$.9a277746-d7fa-488d-9bb1-29fcff8ea1e3.sections') AS section_array_89,
+JSON_EXTRACT(menu_structures, '$.57f18b6b-a240-42ad-850b-835970a5a15f.sections') AS section_array_90,
+JSON_EXTRACT(menu_structures, '$.63d88d91-7787-4659-b192-df720d1e1816.sections') AS section_array_91,
+JSON_EXTRACT(menu_structures, '$.c805fee7-87c0-4837-b904-194800f2414b.sections') AS section_array_92,
+JSON_EXTRACT(menu_structures, '$.c067a342-1310-4384-bcf7-b74ccfb6e409.sections') AS section_array_93,
+JSON_EXTRACT(menu_structures, '$.4313cb3b-0113-400a-a7b0-8a8ec600d6ff.sections') AS section_array_94,
+JSON_EXTRACT(menu_structures, '$.63db644f-50f0-4d8b-8aa6-b7f8b975793b.sections') AS section_array_95,
+JSON_EXTRACT(menu_structures, '$.74e16f19-4b84-486c-b78d-0d48fdfb41df.sections') AS section_array_96,
+JSON_EXTRACT(menu_structures, '$.f6462310-2c8b-4eed-9927-607f76846bb5.sections') AS section_array_97,
+JSON_EXTRACT(menu_structures, '$.fcd3972d-af85-5e22-b6e3-d05983412f98.sections') AS section_array_98,
+JSON_EXTRACT(menu_structures, '$.ae840697-7116-52bd-9c57-500012bfb730.sections') AS section_array_99,
+JSON_EXTRACT(menu_structures, '$.c3e598be-4c78-49e7-ab15-9bb81c517d2e.sections') AS section_array_100
+
+
+
+
+
+    FROM ExtractedMenuStructures
+),
+FlattenedSections AS (
+    SELECT 
+        ue_slug,
+        ue_b_name,
+        ue_vb_name,
+        ue_platform,
+        ue_address,
+        ue_timestamp,
+        section,
+        JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+   FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_1)) AS section
+UNION ALL
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_2)) AS section
+UNION ALL
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_3)) AS section
+UNION ALL
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_4)) AS section
+UNION ALL
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_5)) AS section
+UNION ALL
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_6)) AS section
+UNION ALL
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_7)) AS section
+UNION ALL
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_8)) AS section
+UNION ALL
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_9)) AS section
+UNION ALL
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_10)) AS section
+UNION ALL
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_11)) AS section
+UNION ALL
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_12)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_13)) AS section
+
+UNION ALL
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_14)) AS section
+UNION ALL
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_15)) AS section
+UNION ALL
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_16)) AS section
+UNION ALL
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_17)) AS section
+UNION ALL
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_18)) AS section
+UNION ALL
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_19)) AS section
+UNION ALL
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_20)) AS section
+UNION ALL
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_21)) AS section
+UNION ALL
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_22)) AS section
+UNION ALL
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_23)) AS section
+UNION ALL
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_24)) AS section
+UNION ALL
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_25)) AS section
+UNION ALL
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_26)) AS section
+UNION ALL
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_27)) AS section
+UNION ALL
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_28)) AS section
+UNION ALL
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_29)) AS section
+UNION ALL
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_30)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_31)) AS section
+
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_32)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_33)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_34)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_35)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_36)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_37)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_38)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_39)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_40)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_41)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_42)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_43)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_44)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_45)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_46)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_47)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_48)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_49)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_50)) AS section
+UNION ALL
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_51)) AS section
+
+UNION ALL
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_52)) AS section
+UNION ALL
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_53)) AS section
+UNION ALL
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_54)) AS section
+UNION ALL
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_55)) AS section
+UNION ALL
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_56)) AS section
+UNION ALL
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_57)) AS section
+UNION ALL
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_58)) AS section
+UNION ALL
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_59)) AS section
+UNION ALL
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_60)) AS section
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_60)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_61)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_62)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_63)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_64)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_65)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_66)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_67)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_68)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_69)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_70)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_72)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_73)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_74)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_75)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_76)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_77)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_78)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_79)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_80)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_81)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_82)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_83)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_84)) AS section
+
+UNION ALL
+
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    section,
+    JSON_EXTRACT(section, '$.regularHours') AS regular_hours
+FROM FlattenedMenuStructures, 
+UNNEST(JSON_EXTRACT_ARRAY(section_array_85)) AS section;
+
+
+),
+ExtractedRegularHours AS (
+    SELECT 
+        ue_slug,
+        ue_b_name,
+        ue_vb_name,
+        ue_platform,
+        ue_address,
+        ue_timestamp,
+        regular_hours,
+        JSON_EXTRACT(regular_hours, '$[0].daysBitArray') AS days_bit_array,
+        JSON_EXTRACT_SCALAR(regular_hours, '$[0].startTime') AS start_time,
+        JSON_EXTRACT_SCALAR(regular_hours, '$[0].endTime') AS end_time
+    FROM FlattenedSections
+    WHERE regular_hours IS NOT NULL
+)
+SELECT 
+    ue_slug,
+    ue_b_name,
+    ue_vb_name,
+    ue_platform,
+    ue_address,
+    ue_timestamp,
+    regular_hours,
+    CASE
+        WHEN JSON_EXTRACT_SCALAR(regular_hours, '$[0].daysBitArray[0]') = 'true' THEN 'Sunday'
+        WHEN JSON_EXTRACT_SCALAR(regular_hours, '$[0].daysBitArray[1]') = 'true' THEN 'Monday'
+        WHEN JSON_EXTRACT_SCALAR(regular_hours, '$[0].daysBitArray[2]') = 'true' THEN 'Tuesday'
+        WHEN JSON_EXTRACT_SCALAR(regular_hours, '$[0].daysBitArray[3]') = 'true' THEN 'Wednesday'
+        WHEN JSON_EXTRACT_SCALAR(regular_hours, '$[0].daysBitArray[4]') = 'true' THEN 'Thursday'
+        WHEN JSON_EXTRACT_SCALAR(regular_hours, '$[0].daysBitArray[5]') = 'true' THEN 'Friday'
+        WHEN JSON_EXTRACT_SCALAR(regular_hours, '$[0].daysBitArray[6]') = 'true' THEN 'Saturday'
+        ELSE 'N/A'
+    END AS open_day,
+    start_time,
+    end_time
+FROM ExtractedRegularHours
+WHERE regular_hours IS NOT NULL
+LIMIT 1000;
