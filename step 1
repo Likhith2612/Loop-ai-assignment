@@ -1,0 +1,7 @@
+SELECT * 
+FROM arboreal-vision-339901.take_home_v2.virtual_kitchen_ubereats_hours 
+LIMIT 1000;
+
+SELECT * 
+FROM arboreal-vision-339901.take_home_v2.virtual_kitchen_grubhub_hours 
+LIMIT 1000;
